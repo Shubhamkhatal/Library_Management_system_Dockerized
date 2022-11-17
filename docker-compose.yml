@@ -1,0 +1,36 @@
+version: '3.3'
+
+services:
+  db:
+    image: postgres:13-alpine
+    container_name: backend-db
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=postgres
+      - POSTGRESQL_VOLUME_DIR=/bitnami/postgresql
+      - PGDATA=/bitnami/postgresql/data
+    volumes:
+      - ./data:/bitnami/postgresql
+    
+
+  app:
+    build: ./lms_backend/
+    container_name: backend-app
+    ports:
+      - "6000:8000"
+    environment:
+      - DATABASE_NAME=postgres
+      - DATABASE_HOST=db
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+    depends_on:
+      - db
+  
+  reactapp:
+    build: ./lms_frontend/
+    container_name: frontend-app
+    ports:
+     - "3000:3000"
+    depends_on:
+      - app
